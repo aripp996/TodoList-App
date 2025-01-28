@@ -2,6 +2,8 @@ import 'package:bmi_calculator/constans.dart';
 import 'package:bmi_calculator/widgets/todo_tile_widgets.dart';
 import 'package:flutter/material.dart';
 
+import 'data/todo.dart';
+
 class TodoHomeScreen extends StatefulWidget {
   const TodoHomeScreen({super.key});
 
@@ -10,7 +12,30 @@ class TodoHomeScreen extends StatefulWidget {
 }
 
 class _TodoHomeScreenState extends State<TodoHomeScreen> {
+  List<Todo> _todos = [];
   int _selectedIndex = 0;
+
+  String? _title;
+  String? _description;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _todos = [
+      Todo(title : "Task 1", description : "belajar dart"),
+      Todo(title : "Task 2", description : "belajar flutter"),
+      Todo(title : "Task 3", description : "belajar python"),
+      Todo(title : "Task 4", description : "belajar flask"),
+      Todo(title : "Task 5", description : "belajar golang"),
+      Todo(title : "Task 6", description : "belajar swift"),
+      Todo(title : "Task 7", description : "belajar kotlin"),
+      Todo(title : "Task 8", description : "belajar php"),
+      Todo(title : "Task 9", description : "belajar javascript"),
+      Todo(title : "Task 10", description : "belajar typescript"),
+      Todo(title : "Task 11", description : "belajar r lang"),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +94,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
               itemBuilder: (context, index) {
                 return Column(
                   children: [
-                    TodoTileWidgets(todo: DummyData.taskLists[index]),
+                    TodoTileWidgets(todo: _todos[index]),
                     const SizedBox( height: 16.0),
                     const Divider(
                       thickness: 0.1,
@@ -79,7 +104,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                   ],
                 );
               },
-              itemCount: DummyData.taskLists.length,
+              itemCount: _todos.length,
             ),
           ),
         ],
@@ -159,6 +184,15 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     });
   }
 
+  void _addTodo() {
+    if (_title != null && _description != null) {
+      var todo = Todo(
+        title: _title!,
+        description: _description!,
+      );
+    }
+  }
+
   void _showAddTaskModalBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -176,8 +210,11 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const TextField(
-                decoration: InputDecoration(
+              TextField(
+                onChanged: (value) {
+                  _title = value;
+                },
+                decoration: const InputDecoration(
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 16.0,
                   ),
@@ -190,7 +227,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     decoration: TextDecoration.none,
                   )
                 ),
-                style: TextStyle(
+                style: const TextStyle(
                   color: ColorPallete.grey,
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -200,8 +237,11 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 cursorColor: ColorPallete.red,
                 autofocus: true,
               ),
-               const TextField(
-                decoration: InputDecoration(
+               TextField(
+                onChanged: (value) {
+                  _description = value;
+                },
+                decoration: const InputDecoration(
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 16.0,
                   ),
@@ -214,7 +254,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     decoration: TextDecoration.none,
                   )
                 ),
-                style: TextStyle(
+                style: const TextStyle(
                   color: ColorPallete.grey,
                   fontSize: 14.0,
                   fontWeight: FontWeight.bold,
@@ -240,6 +280,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     ),
                     IconButton(
                       onPressed: () {
+                        _addTodo();
                         Navigator.pop(context);
                       },
                       icon: const Icon(
