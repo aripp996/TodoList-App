@@ -1,4 +1,5 @@
 import 'package:bmi_calculator/constans.dart';
+import 'package:bmi_calculator/service/todo_shared_preferences.dart';
 import 'package:bmi_calculator/widgets/todo_tile_widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,7 @@ class TodoHomeScreen extends StatefulWidget {
 }
 
 class _TodoHomeScreenState extends State<TodoHomeScreen> {
+  late TodoSharedPreferences _todoSharedPreferences;
   List<Todo> _todos = [];
   int _selectedIndex = 0;
 
@@ -21,20 +23,32 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   @override
   void initState() {
     super.initState();
+    _todoSharedPreferences = TodoSharedPreferences();
+    _initTodos();
+  }
 
-    _todos = [
-      Todo(title : "Task 1", description : "belajar dart"),
-      Todo(title : "Task 2", description : "belajar flutter"),
-      Todo(title : "Task 3", description : "belajar python"),
-      Todo(title : "Task 4", description : "belajar flask"),
-      Todo(title : "Task 5", description : "belajar golang"),
-      Todo(title : "Task 6", description : "belajar swift"),
-      Todo(title : "Task 7", description : "belajar kotlin"),
-      Todo(title : "Task 8", description : "belajar php"),
-      Todo(title : "Task 9", description : "belajar javascript"),
-      Todo(title : "Task 10", description : "belajar typescript"),
-      Todo(title : "Task 11", description : "belajar r lang"),
-    ];
+  void _initTodos() async {
+    var todos = await _todoSharedPreferences.getAllTodos();
+
+    if (todos.isEmpty){
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 1", description : "belajar dart"));
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 2", description : "belajar flutter"));
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 3", description : "belajar python"));
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 4", description : "belajar flask"));
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 5", description : "belajar golang"));
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 6", description : "belajar swift"));
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 7", description : "belajar kotlin"));
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 8", description : "belajar php"));
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 9", description : "belajar javascript"));
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 10", description : "belajar typescript"));
+      await _todoSharedPreferences.saveTodo(Todo(title : "Task 11", description : "belajar r lang"));
+
+      todos = await _todoSharedPreferences.getAllTodos();
+    }
+
+    setState(() {
+      _todos = todos;
+    });
   }
 
   @override
@@ -94,7 +108,11 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
               itemBuilder: (context, index) {
                 return Column(
                   children: [
-                    TodoTileWidgets(todo: _todos[index]),
+                    TodoTileWidgets(
+                      key: ValueKey(_todos[index].id),
+                      todo: _todos[index],
+                      checkedTodo: _checkedTodo,  
+                    ),
                     const SizedBox( height: 16.0),
                     const Divider(
                       thickness: 0.1,
@@ -190,7 +208,21 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
         title: _title!,
         description: _description!,
       );
+
+      _todoSharedPreferences.saveTodo(todo);
+
+      setState(() {
+        _todos.add(todo);
+      });
     }
+  }
+
+  Future<void> _checkedTodo(String id) async{
+    await _todoSharedPreferences.deleteTodoById(id);
+
+    setState(() {
+      _todos.removeWhere((todo) => todo.id == id);
+    });
   }
 
   void _showAddTaskModalBottomSheet(BuildContext context) {
